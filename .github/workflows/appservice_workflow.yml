@@ -1,0 +1,44 @@
+name: Docker Image Deployment to Azure Web App
+
+name: Build and deploy react js app to Azure Web App
+'on':
+    push:
+        branches:
+          - "dhana-develop"
+env:
+  DOCKER_IMAGE_NAME: 'alm-react-appservice-poc'
+  AZURE_WEB_APP: 'alm-react-appservice-poc'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
+
+    - name: Docker Login
+      uses: azure/docker-login@v1
+          with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+    - name: Tag the Docker image
+      run: docker tag '${{env.DOCKER_IMAGE_NAME}}':latest '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
+    - name: Push the Docker image
+      run: docker push '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Azure WebApp Deployment
+      uses: Azure/webapps-deploy@v2
+      with:
+        # Name of the Azure Web App
+        app-name: '${{env.AZURE_WEB_APP}}'
+        images: '${{secrets.REGISTRY_LOGIN_SERVER}}/${{env.DOCKER_IMAGE_NAME}}:latest'
