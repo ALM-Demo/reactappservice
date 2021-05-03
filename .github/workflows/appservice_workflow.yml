@@ -1,6 +1,5 @@
 name: Docker Image Deployment to Azure Web App
 
-name: Build and deploy react js app to Azure Web App
 'on':
     push:
         branches:
