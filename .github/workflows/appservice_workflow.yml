@@ -14,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Do Something Based On Triggered Event Data
-      run: 'echo "Azure Webapp name: ${{env.AZURE_WEB_APP}}"'
+    - name: Print Dispatch Event Inputs
+      run: |
+        echo 'echo "Docker image name: ${{env.DOCKER_IMAGE_NAME}}"'
+        echo 'echo "Azure Webapp name: ${{env.AZURE_WEB_APP}}"'
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
