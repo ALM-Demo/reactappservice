@@ -1,7 +1,6 @@
 This is a React app bootstrapped with creat-react-app with configuration to build it into a Docker image
 
 ## To build Docker image of this app
-
 - `docker image build -t react:app .` (You can replace 'react:app' to whatever you want, e.g.: 'myreact:16')
 - To see the image, run `docker image ls react:app`
 
