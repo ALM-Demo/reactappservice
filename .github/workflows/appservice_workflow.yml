@@ -1,12 +1,11 @@
-name: Docker Image Deployment to Azure Web App
+name: Azure WebApp Container Deployment 
 
-'on':
-    push:
-        branches:
-          - "main"
+on:
+  repository_dispatch:
+    types: deployApp
 env:
-  DOCKER_IMAGE_NAME: 'alm-react-appservice-poc'
-  AZURE_WEB_APP: 'alm-react-appservice-poc'
+  DOCKER_IMAGE_NAME: "${{ github.event.client_payload.docker_image_name }}"
+  AZURE_WEB_APP: "${{ github.event.client_payload.webapp_name }}"
 
 jobs:
 
@@ -15,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Do Something Based On Triggered Event Data
+      run: 'echo "Azure Webapp name: ${{env.AZURE_WEB_APP}}"'
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
