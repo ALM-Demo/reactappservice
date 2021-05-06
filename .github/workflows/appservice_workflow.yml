@@ -34,29 +34,6 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
   
-
-    - name: Set Web App ACR authentication
-      uses: Azure/appservice-settings@v1
-      with:
-        app-name: ${{ env.AZURE_WEB_APP }} 
-        app-settings-json: |
-          [
-              {
-                  "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-                  "value": "${{ secrets.REGISTRY_PASSWORD }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "DOCKER_REGISTRY_SERVER_URL",
-                  "value": "https://${{ secrets.REGISTRY_LOGIN_SERVER }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-                  "value": "${{ secrets.REGISTRY_USERNAME  }}",
-                  "slotSetting": false
-              }
-          ]  
     - name: Azure WebApp Deployment
       uses: Azure/webapps-deploy@v2
       with:
