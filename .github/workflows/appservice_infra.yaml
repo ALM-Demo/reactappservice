@@ -1,12 +1,16 @@
 jobs:
   create-infra:
     env:
-      AZURE_REGISTRY_NAME: acralmpoc
-      AZURE_RESOURCE_GROUP: rg-by-workflow-shared-dev-eus2-01
+      AZURE_REGISTRY_NAME: 'acralmpoc'
+      AZURE_RESOURCE_GROUP: 'rg-by-workflow-shared-dev-eus2-01'
       DOCKER_IMAGE_NAME: 'alm-react-appservice-poc'
       AZURE_WEB_APP: 'alm-react-appservice-poc'
       AZURE_APP_RUNTIME: 'NODE|12-lts'
       AZURE_SERVICE_PLAN_NAME: 'aspn-alm-react-appservice-poc'
+      CONTAINER_REGISTRY_SKU: 'Basic'
+      WEB_APP_SKU: 'S1'
+      NUMBER_OF_WORKERS: '4'
+      
     name: Create Infra
     runs-on: ubuntu-latest
     steps:
@@ -15,11 +19,9 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Create Container Registry
-      run: 'az acr create --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_REGISTRY_NAME --sku Basic --admin-enabled true'
-      #run: 'az acr delete --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_REGISTRY_NAME --yes'
-      #run: 'az acr credential show --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_REGISTRY_NAME'
+      run: 'az acr create --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_REGISTRY_NAME --sku $CONTAINER_REGISTRY_SKU --admin-enabled true'
     - name: Create App Service plan
-      run: 'az appservice plan create --name $AZURE_SERVICE_PLAN_NAME --resource-group $AZURE_RESOURCE_GROUP --is-linux --number-of-workers 4 --sku S1'
+      run: 'az appservice plan create --name $AZURE_SERVICE_PLAN_NAME --resource-group $AZURE_RESOURCE_GROUP --is-linux --number-of-workers $NUMBER_OF_WORKERS --sku $WEB_APP_SKU'
     - name: Create azure webapp Docker Container
       run: 'az webapp create --resource-group $AZURE_RESOURCE_GROUP --plan $AZURE_SERVICE_PLAN_NAME --name $AZURE_WEB_APP --deployment-container-image-name ${{ secrets.REGISTRY_LOGIN_SERVER}}/${{env.DOCKER_IMAGE_NAME}}:latest'
       
