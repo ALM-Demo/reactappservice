@@ -24,8 +24,8 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - run: |
        az acr credential show --resource-group $AZURE_RESOURCE_GROUP --name $REGISTRY_LOGIN_SERVER
-       REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output tsv --query accessToken)
-       docker login acralmpoc.azurecr.io --username acralmpoc --password $REGISTRY_PASSWORD
+       REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output --password-stdintsv --query accessToken)
+       docker login acralmpoc.azurecr.io --username acralmpoc --password $REGISTRY_PASSWORD --password-stdin
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
     - name: List Docker images
