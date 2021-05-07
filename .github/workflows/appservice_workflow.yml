@@ -15,6 +15,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - run: |
+       az acr credential show --resource-group $AZURE_RESOURCE_GROUP --name $REGISTRY_LOGIN_SERVER
+       export REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output tsv --query accessToken)
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
     - name: List Docker images
@@ -24,19 +31,12 @@ jobs:
       with:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
             username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ secrets.REGISTRY_PASSWORD }}
+            password: $REGISTRY_PASSWORD
     - name: Tag the Docker image
       run: docker tag '${{env.DOCKER_IMAGE_NAME}}':latest '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
     - name: Push the Docker image
       run: docker push '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - run: |
-       az acr credential show --resource-group $AZURE_RESOURCE_GROUP --name $REGISTRY_LOGIN_SERVER
-       export REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output tsv --query accessToken)
-       
+
     - name: Set Web App ACR authentication
       uses: Azure/appservice-settings@v1
       with:
