@@ -5,7 +5,8 @@ on:
 env:
   DOCKER_IMAGE_NAME: "alm-react-appservice-poc"
   AZURE_WEB_APP: "alm-react-appservice-poc"
-  AZURE_RESOURCE_GROUP: 'rg-by-workflow-shared-dev-eus2-01'
+  AZURE_RESOURCE_GROUP: "rg-by-workflow-shared-dev-eus2-01"
+  REGISTRY_LOGIN_SERVER: "acralmpoc"
 
 jobs:
 
