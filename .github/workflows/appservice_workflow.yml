@@ -22,13 +22,13 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - run: |
        az acr credential show --resource-group $AZURE_RESOURCE_GROUP --name $REGISTRY_LOGIN_SERVER
-       export REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output tsv --query accessToken)
+       REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output tsv --query accessToken)
     - name: Docker Login
       uses: azure/docker-login@v1
       with:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
             username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ env.REGISTRY_PASSWORD }}
+            password: $REGISTRY_PASSWORD
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
     - name: List Docker images
