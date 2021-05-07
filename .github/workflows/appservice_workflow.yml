@@ -1,7 +1,9 @@
 name: webapp deploy
-on:
-  workflow_dispatch:
-    inputs: 
+'on':
+  push:
+    paths:
+    - .github/workflows/appservice_workflow.yml
+    - '*.json'
 env:
   DOCKER_IMAGE_NAME: "alm-react-appservice-poc"
   AZURE_WEB_APP: "alm-react-appservice-poc"
@@ -28,7 +30,7 @@ jobs:
       with:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
             username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ REGISTRY_PASSWORD }}
+            password: ${{ env.REGISTRY_PASSWORD }}
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
     - name: List Docker images
