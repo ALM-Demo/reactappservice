@@ -4,8 +4,8 @@ name: deploy
     paths:
     - .github/workflows/appservice_workflow.yml
 env:
-  DOCKER_IMAGE_NAME: "alm-react-appservice-poc"
-  AZURE_WEB_APP: "alm-react-appservice-poc"
+  DOCKER_IMAGE_NAME: "alm-react-appservice-poc1"
+  AZURE_WEB_APP: "alm-react-appservice-poc1"
 
 jobs:
 
