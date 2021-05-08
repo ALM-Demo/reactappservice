@@ -22,7 +22,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - run: |
        az acr credential show -n $REGISTRY_NAME --query passwords[0].value
-       az acr login -name $REGISTRY_NAME –expose-token
+       az acr login -name $REGISTRY_NAME --expose-token
     - name: Docker Login
       uses: azure/docker-login@v1
       with:
