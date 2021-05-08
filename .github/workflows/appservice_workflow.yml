@@ -1,14 +1,11 @@
-name: webapp deploy
+name: deploy
 'on':
   push:
     paths:
     - .github/workflows/appservice_workflow.yml
-    - '*.json'
 env:
   DOCKER_IMAGE_NAME: "alm-react-appservice-poc"
   AZURE_WEB_APP: "alm-react-appservice-poc"
-  AZURE_RESOURCE_GROUP: "rg-by-workflow-shared-dev-eus2-01"
-  REGISTRY_LOGIN_SERVER: "acralmpoc"
 
 jobs:
 
@@ -22,10 +19,12 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - run: |
-       az acr credential show --resource-group $AZURE_RESOURCE_GROUP --name $REGISTRY_LOGIN_SERVER
-       REGISTRY_PASSWORD=$(az acr login --name $REGISTRY_LOGIN_SERVER --expose-token --output --password-stdintsv --query accessToken)
-       docker login acralmpoc.azurecr.io --username acralmpoc --password $REGISTRY_PASSWORD --password-stdin
+    - name: Docker Login
+      uses: azure/docker-login@v1
+      with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
     - name: List Docker images
@@ -33,30 +32,8 @@ jobs:
     - name: Tag the Docker image
       run: docker tag '${{env.DOCKER_IMAGE_NAME}}':latest '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
     - name: Push the Docker image
-      run: docker push '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
-
-    - name: Set Web App ACR authentication
-      uses: Azure/appservice-settings@v1
-      with:
-        app-name: ${{ env.AZURE_WEB_APP }} 
-        app-settings-json: |
-          [
-              {
-                  "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-                  "value": "$REGISTRY_PASSWORD",
-                  "slotSetting": false
-              },
-              {
-                  "name": "DOCKER_REGISTRY_SERVER_URL",
-                  "value": "https://${{ secrets.REGISTRY_LOGIN_SERVER }}",
-                  "slotSetting": false
-              },
-              {
-                  "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-                  "value": "${{ secrets.REGISTRY_USERNAME  }}",
-                  "slotSetting": false
-              }
-          ]  
+      run: docker push '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest	  
+  
     - name: Azure WebApp Deployment
       uses: Azure/webapps-deploy@v2
       with:
