@@ -37,6 +37,6 @@ jobs:
     - name: Azure WebApp Deployment
       uses: Azure/webapps-deploy@v2
       with:
-        # Name of the Azure Web App
+        # Name of the Azure Web Apps
         app-name: '${{env.AZURE_WEB_APP}}'
         images: '${{secrets.REGISTRY_LOGIN_SERVER}}/${{env.DOCKER_IMAGE_NAME}}:latest'
