@@ -30,6 +30,6 @@ jobs:
     - name: Create App Service plan
       run: 'az appservice plan create --name $AZURE_SERVICE_PLAN_NAME --resource-group $AZURE_RESOURCE_GROUP --is-linux --number-of-workers $NUMBER_OF_WORKERS --sku $WEB_APP_SKU'
     - name: Create azure webapp Docker Container
-      run: 'az webapp create --resource-group $AZURE_RESOURCE_GROUP --plan $AZURE_SERVICE_PLAN_NAME --name $AZURE_WEB_APP'
+      run: 'az webapp create --resource-group $AZURE_RESOURCE_GROUP --plan $AZURE_SERVICE_PLAN_NAME --name $AZURE_WEB_APP --runtime $AZURE_APP_RUNTIME'
       
     
