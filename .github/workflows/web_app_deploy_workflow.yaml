@@ -1,17 +1,23 @@
+name: infra
+'on':
+  push:
+    paths:
+    - .github/workflows/web_app_deploy_workflow.yaml
+
 env:
-  AZURE_WEB_APP: ${{ github.event.client_payload.webapp_name }}
-  DOCKER_IMAGE_NAME: ${{ github.event.client_payload.docker_image_name }}
+  AZURE_WEB_APP: "alm-app--dev"
+  DOCKER_IMAGE_NAME: "docimg"
 jobs:
   deploy-web-app:
     env:
       AZURE_ACR_ADMIN_ENABLED: true
       AZURE_ACR_NAME_PREFIX: almacr
-      AZURE_DEPLOY_ENVIRONMENT: ${{ github.event.client_payload.environment }}
-      AZURE_RESOURCE_GROUP: ${{ github.event.client_payload.resource_group }}
-      AZURE_SUBSCRIPTION: ${{ github.event.client_payload.subscription }}
+      AZURE_DEPLOY_ENVIRONMENT: "dev"
+      AZURE_RESOURCE_GROUP: ""
+      AZURE_SUBSCRIPTION: "test"
       AZURE_WEB_APP_NAME_PREFIX: alm-app
-      AZURE_WEB_APP_TYPE: ${{ github.event.client_payload.app_type }}
-      GITHUB_REPO_NAME: ${{ github.event.client_payload.repo }}
+      AZURE_WEB_APP_TYPE: "web_app"
+      GITHUB_REPO_NAME: "reactappcontainer"
     runs-on: ubuntu-latest
     steps:
     - name: Set env
