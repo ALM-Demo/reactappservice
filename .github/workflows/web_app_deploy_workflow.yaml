@@ -52,13 +52,13 @@ jobs:
         docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
         docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest"
         
-    # - name: Deploy New Image in Azure Web App
-    #   run: | 
-    #     az webapp config container set --name $AZURE_WEB_APP_NAME \
-    #     --resource-group $AZURE_RESOURCE_GROUP \
-    #     --docker-custom-image-name "DOCKER|$AZURE_ACR_NAME/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
-    - name: Azure WebApp Deployment
-      uses: Azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEB_APP_NAME }}
-        images: ${{ env.AZURE_ACR_NAME }}/${{ env.AZURE_WEB_APP_IMAGE_NAME }}:${{ env.AZURE_WEB_APP_IMAGE_TAG }}
+    - name: Deploy New Image in Azure Web App
+      run: | 
+        az webapp config container set --name $AZURE_WEB_APP_NAME \
+        --resource-group $AZURE_RESOURCE_GROUP \
+        --docker-custom-image-name "${AZURE_ACR_NAME}.azure.io/${AZURE_WEB_APP_IMAGE_NAME}:${AZURE_WEB_APP_IMAGE_TAG}"
+    # - name: Azure WebApp Deployment
+    #   uses: Azure/webapps-deploy@v2
+    #   with:
+    #     app-name: ${{ env.AZURE_WEB_APP_NAME }}
+    #     images: ${{ env.AZURE_ACR_NAME }}/${{ env.AZURE_WEB_APP_IMAGE_NAME }}:${{ env.AZURE_WEB_APP_IMAGE_TAG }}
