@@ -1,5 +1,5 @@
 name: Create Infra for Azure Web App
-'on':
+on:
   repository_dispatch:
     types: app_service_infra
 jobs:
