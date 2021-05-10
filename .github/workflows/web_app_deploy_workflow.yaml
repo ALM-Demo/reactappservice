@@ -45,15 +45,15 @@ jobs:
       name: Get Timestamp
       run: 'echo "AZURE_WEB_APP_IMAGE_TAG=$(date ''+%Y-%m-%d-%H-%M-%S'')" >> $GITHUB_ENV'
     - name: Build Docker Image
-      run: 'docker build .github/docker --file Dockerfile --tag "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
+      run: 'docker build .github/docker --file Dockerfile --tag "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"'
 
     - name: Tag Docker Image
       run: 'docker tag $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG
-        $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest
+        $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest'
 
     - name: Push Docker Images
-      run: 'docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
-
+      run: |
+        docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
         docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest"
 
     - name: Login to ACR
