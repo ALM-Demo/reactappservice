@@ -40,16 +40,14 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - name: Create Azure Container Registry
-    - id: time
+
     - name: Get Timestamp
       run: 'echo "AZURE_WEB_APP_IMAGE_TAG=$(date ''+%Y-%m-%d-%H-%M-%S'')" >> $GITHUB_ENV'
     - name: Build Docker Image
       run: 'docker build .github/docker --file Dockerfile --tag "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"'
 
     - name: Tag Docker Image
-      run: 'docker tag $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG
-        $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest'
+      run: 'docker tag $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest'
 
     - name: Push Docker Images
       run: |
