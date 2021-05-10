@@ -23,7 +23,18 @@ jobs:
     - run: |
        dpwd=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value"  -o tsv)
        echo $dpwd | docker login acralmpoc.azurecr.io --username $REGISTRY_NAME --password-stdin
-       #echo $dpwd | docker login docker.pkg.github.com -u USERNAME 
-       #az acr credential show -n $REGISTRY_NAME --query passwords[0].value
-       #az acr login -name $REGISTRY_NAME --expose-token
-
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag '${{env.DOCKER_IMAGE_NAME}}':latest
+    - name: List Docker images
+      run: docker images
+    - name: Tag the Docker image
+      run: docker tag '${{env.DOCKER_IMAGE_NAME}}':latest '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest
+    - name: Push the Docker image
+      run: docker push '${{secrets.REGISTRY_LOGIN_SERVER}}'/'${{env.DOCKER_IMAGE_NAME}}':latest	  
+  
+    - name: Azure WebApp Deployment
+      uses: Azure/webapps-deploy@v2
+      with:
+        # Name of the Azure Web Appss
+        app-name: '${{env.AZURE_WEB_APP}}'
+        images: '${{secrets.REGISTRY_LOGIN_SERVER}}/${{env.DOCKER_IMAGE_NAME}}:latest'
