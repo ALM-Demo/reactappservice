@@ -21,7 +21,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - run: |
-       echo "dpwd=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value"  -o tsv)" >> $GITHUB_ENV
+       echo "dpwd=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value"  -o tsv)" --password-stdin
        echo $dpwd
        #az acr credential show -n $REGISTRY_NAME --query passwords[0].value
        #az acr login -name $REGISTRY_NAME --expose-token
@@ -30,4 +30,4 @@ jobs:
       with:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
             username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ env.dpwd }} --password-stdin
+            password: ${{ env.dpwd }}
