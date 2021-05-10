@@ -61,5 +61,5 @@ jobs:
       uses: Azure/webapps-deploy@v2
       with:
         # Name of the Azure Web App
-        app-name: ${{AZURE_WEB_APP_NAME}}
+        app-name: "${{AZURE_WEB_APP_NAME}}"
         images: "${{AZURE_ACR_NAME}}/${{AZURE_WEB_APP_IMAGE_NAME}}:${{AZURE_WEB_APP_IMAGE_TAG}}"
