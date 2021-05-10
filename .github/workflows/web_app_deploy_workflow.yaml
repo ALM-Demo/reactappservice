@@ -43,15 +43,15 @@ jobs:
       run: |
         docker tag $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest
         
+    - name: Login to ACR
+      run: |
+        az acr login --name $AZURE_ACR_NAME
+
     - name: Push Docker Images
       run: |
         docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
         docker push "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:latest"
         
-    - name: Login to ACR
-      run: |
-        az acr login --name $AZURE_ACR_NAME
-
     - name: Deploy New Image in Azure Web App
       run: | 
         az webapp config container set --name $AZURE_WEB_APP_NAME \
