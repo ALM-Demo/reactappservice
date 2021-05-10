@@ -1,10 +1,12 @@
+name: infra
+'on':
+  push:
+    paths:
+    - .github/workflows/web_app_deploy_workflow.yaml
+
 env:
-  AZURE_WEB_APP: ${{ github.event.client_payload.webapp_name }}
-  DOCKER_IMAGE_NAME: ${{ github.event.client_payload.docker_image_name }}
-name: Deploy Azure Web App
-true:
-  repository_dispatch:
-    types: app_service_deploy
+  AZURE_WEB_APP: "alm-app--dev"
+  DOCKER_IMAGE_NAME: "docimg"
 jobs:
   deploy-web-app:
     env:
