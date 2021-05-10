@@ -21,8 +21,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - run: |
-       export dpwd=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value"  -o tsv) --password-stdin
-       echo $dpwd
+       export dpwd=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value"  -o tsv)
        #az acr credential show -n $REGISTRY_NAME --query passwords[0].value
        #az acr login -name $REGISTRY_NAME --expose-token
     - name: Docker Login
@@ -30,4 +29,4 @@ jobs:
       with:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER}}
             username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ env.dpwd }}
+            password: --password-stdin $dpwd
