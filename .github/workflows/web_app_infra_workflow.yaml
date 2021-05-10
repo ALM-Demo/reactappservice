@@ -44,7 +44,8 @@ jobs:
       run: |
         az webapp create --resource-group $AZURE_RESOURCE_GROUP \
         --plan $AZURE_WEB_APP_SVC_PLAN \
-        --name $AZURE_WEB_APP_NAME
+        --name $AZURE_WEB_APP_NAME \
+        --deployment-container-image-name "$AZURE_ACR_NAME/$AZURE_WEB_APP_IMAGE_NAME:latest"
         
     - name: Update Web App Container Settings
       run: | 
