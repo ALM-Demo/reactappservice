@@ -61,7 +61,3 @@ jobs:
         --resource-group $AZURE_RESOURCE_GROUP \
 
         --docker-custom-image-name "DOCKER|$AZURE_ACR_NAME/$AZURE_WEB_APP_IMAGE_NAME:latest"'
-name: Deploy Azure Web App
-'on':
-  repository_dispatch:
-    types: app_service_deploy
