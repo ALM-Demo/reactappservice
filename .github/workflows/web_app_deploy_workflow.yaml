@@ -43,8 +43,7 @@ jobs:
     - name: Create Azure Container Registry
     - id: time
       name: Get Timestamp
-      run: 'echo "AZURE_WEB_APP_IMAGE_TAG=$(date ''+%Y-%m-%d-%H-%M-%S'')" >> $GITHUB_ENV
-
+      run: 'echo "AZURE_WEB_APP_IMAGE_TAG=$(date ''+%Y-%m-%d-%H-%M-%S'')" >> $GITHUB_ENV'
     - name: Build Docker Image
       run: 'docker build .github/docker --file Dockerfile --tag "$AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG"
 
