@@ -46,11 +46,7 @@ jobs:
         --plan $AZURE_WEB_APP_SVC_PLAN \
         --name $AZURE_WEB_APP_NAME \
         --deployment-container-image-name "$AZURE_ACR_NAME.azure.io/$AZURE_WEB_APP_IMAGE_NAME:latest"
-    
-    - name: Login to ACR
-      run: |
-        az acr login --name $AZURE_ACR_NAME    
-    
+        
     - name: Update Web App Container Settings
       run: | 
         az webapp config container set --name $AZURE_WEB_APP_NAME \
