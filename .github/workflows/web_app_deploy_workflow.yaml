@@ -40,7 +40,8 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
+    - name: Create Azure Container Registry
+    - id: time
     - name: Get Timestamp
       run: 'echo "AZURE_WEB_APP_IMAGE_TAG=$(date ''+%Y-%m-%d-%H-%M-%S'')" >> $GITHUB_ENV'
     - name: Build Docker Image
