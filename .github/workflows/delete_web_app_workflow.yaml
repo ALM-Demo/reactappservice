@@ -1,0 +1,27 @@
+name: Destroy Azure Web App
+on:
+  repository_dispatch:
+    types: delete_web_app
+jobs:
+  create-web-app-infra:      
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REPO_NAME: "${{ github.event.client_payload.repo }}"
+      AZURE_SUBSCRIPTION: "${{ github.event.client_payload.subscription }}"
+      AZURE_RESOURCE_GROUP: "${{ github.event.client_payload.resource_group }}"
+      AZURE_DEPLOY_ENVIRONMENT: "${{ github.event.client_payload.environment }}"
+      AZURE_WEB_APP_TYPE: "${{ github.event.client_payload.app_type }}"
+      AZURE_WEB_APP_NAME_PREFIX: 'alm-app'
+    steps:
+    - name: Set env
+      run: |
+        echo "AZURE_WEB_APP_NAME=${AZURE_WEB_APP_NAME_PREFIX}-${AZURE_WEB_APP_TYPE}-${GITHUB_REPO_NAME}-${AZURE_DEPLOY_ENVIRONMENT}" >> $GITHUB_ENV
+    
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Delete Azure Web App
+      run: |
+        az webapp delete --name $AZURE_WEB_APP_NAME --resource-group $AZURE_RESOURCE_GROUP
