@@ -17,8 +17,7 @@ jobs:
     steps:
     - name: Set env
       run: |
-        echo "AZURE_WEB_APP_NAME_PREFIX=${AZURE_WEB_APP_NAME_PREFIX}-${AZURE_WEB_APP_TYPE}" >> $GITHUB_ENV
-        echo "AZURE_WEB_APP_NAME=${AZURE_WEB_APP_NAME_PREFIX}-${GITHUB_REPO_NAME}-${AZURE_DEPLOY_ENVIRONMENT}" >> $GITHUB_ENV
+        echo "AZURE_WEB_APP_NAME=${AZURE_WEB_APP_NAME_PREFIX}-${AZURE_WEB_APP_TYPE}-${GITHUB_REPO_NAME}-${AZURE_DEPLOY_ENVIRONMENT}" >> $GITHUB_ENV
         echo "AZURE_ACR_NAME=${AZURE_ACR_NAME_PREFIX}${AZURE_DEPLOY_ENVIRONMENT}" >> $GITHUB_ENV
         echo "AZURE_WEB_APP_IMAGE_NAME=${GITHUB_REPO_NAME}-${AZURE_DEPLOY_ENVIRONMENT}" >> $GITHUB_ENV
         
@@ -56,9 +55,4 @@ jobs:
       run: | 
         az webapp config container set --name $AZURE_WEB_APP_NAME \
         --resource-group $AZURE_RESOURCE_GROUP \
-        --docker-custom-image-name "${AZURE_ACR_NAME}.azure.io/${AZURE_WEB_APP_IMAGE_NAME}:${AZURE_WEB_APP_IMAGE_TAG}"
-    # - name: Azure WebApp Deployment
-    #   uses: Azure/webapps-deploy@v2
-    #   with:
-    #     app-name: ${{ env.AZURE_WEB_APP_NAME }}
-    #     images: ${{ env.AZURE_ACR_NAME }}/${{ env.AZURE_WEB_APP_IMAGE_NAME }}:${{ env.AZURE_WEB_APP_IMAGE_TAG }}
+        --docker-custom-image-name ${AZURE_ACR_NAME}.azure.io/${AZURE_WEB_APP_IMAGE_NAME}:${AZURE_WEB_APP_IMAGE_TAG}
