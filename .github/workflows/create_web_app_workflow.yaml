@@ -76,22 +76,68 @@ jobs:
       run: | 
         az webapp config container set -n $AZURE_WEB_APP_NAME -g $AZURE_RESOURCE_GROUP --docker-custom-image-name $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG --docker-registry-server-url https://$AZURE_ACR_NAME.azurecr.io --docker-registry-server-user $AZURE_ACR_NAME --docker-registry-server-password `az acr credential show -n $AZURE_ACR_NAME --query passwords[0].value -o tsv`
 
-    - name: Update Azure Web App Endpoints File
+   - name: get appservice endpoint url
       run: |
-        if [ ! -f .github/webapps/webapps.json ];then
+        echo "ENDPOINT_URL=https://$(az webapp config hostname list --webapp-name $AZURE_WEB_APP_NAME --resource-group $AZURE_RESOURCE_GROUP --query [].name -o tsv)" >> $GITHUB_ENV
+
+    - name: create json and add element to json
+      run: |
+        if [ ! -f .github/webapps/webapps.json ]
+        then
           mkdir -p .github/webapps
           touch .github/webapps/webapps.json
+        cat >.github/webapps/webapps.json <<EOF
+        {
+           "$AZURE_WEB_APP_NAME":{
+              "resource_group":"$AZURE_RESOURCE_GROUP",
+              "webapp_endpoint":"$ENDPOINT_URL"
+           }
+        }
+        EOF
+        cat .github/webapps/webapps.json
+        git add .github/webapps/webapps.json
+        git config --global user.email "dhanasekhar.podigiri@blueyonder.com"
+        git config --global user.name "dhanasekhar podigiri"
+        git commit .github/webapps/webapps.json -m "host name updated"
+        git push
         fi
-        export WEB_APP_URL=`az webapp config hostname list --webapp-name $AZURE_WEB_APP_NAME --resource-group $AZURE_RESOURCE_GROUP --query [].name -o tsv`
-        jq --arg webapp_name $AZURE_WEB_APP_NAME --arg resource_group $AZURE_RESOURCE_GROUP --arg webapp_url "https://$WEB_APP_URL" '. + {($webapp_name): {"resource_group": $resource_group, "webapp_url": $webapp_url}}' < .github/webapps/webapps.json > tmp_webapps.json && mv tmp_webapps.json .github/webapps/webapps.json
-        git config --global user.email "siva.medapati@blueyonder.com"
-        git config --global user.name "Siva Medapati"
-        git config pull.rebase false
-        git pull origin ${BRANCH}
-        git add -f .github/webapps/webapps.json
-        if [ -z "$(git status --porcelain)" ]; then 
-          echo "Nothing to commit"
-        else 
-          git commit -m "update webapp endpoint"
-          git push origin ${BRANCH}
+    - name: check application availabiltiy in json
+      run:   echo ::set-output name=appout::$(grep "$AZURE_WEB_APP_NAME" .github/webapps/webapps.json | wc -l)
+      id:    appgrep
+      shell: bash
+    - name: add endpoint with json
+      if: steps.appgrep.outputs.appout == '0'
+      run: |
+        sed -i '$d' .github/webapps/webapps.json | sed '$d' | sed '$d'
+        sed -i '$d' .github/webapps/webapps.json | sed '$d' | sed '$d'
+        cat >>.github/webapps/webapps.json <<EOF
+           },
+           "$AZURE_WEB_APP_NAME": {
+              "resource_group": "$AZURE_RESOURCE_GROUP",
+              "webapp_endpoint": "$ENDPOINT_URL"
+           }
+        }
+        EOF
+        git add .github/webapps/webapps.json
+        git config --global user.email "dhanasekhar.podigiri@blueyonder.com"
+        git config --global user.name "dhanasekhar podigiri"
+        git commit .github/webapps/webapps.json -m "host name updated"
+        git push
+    - name: compare and update application name in json 
+      run: |
+        echo "$(jq '."${{ env.AZURE_WEB_APP_NAME }}"'.webapp_endpoint .github/webapps/webapps.json)" >> temp.txt
+        temp=`cat temp.txt`
+        temp=`echo $temp | sed "s/\"//g"`
+        if [[ "$temp" != "$ENDPOINT_URL" ]]
+        then
+        cat .github/webapps/webapps.json | \
+        jq '."${{ env.AZURE_WEB_APP_NAME }}".webapp_endpoint="${{ env.ENDPOINT_URL }}"' .github/webapps/webapps.json \
+        > out.json
+        mv out.json .github/webapps/webapps.json
+        cat .github/webapps/webapps.json
+        git add .github/webapps/webapps.json
+        git config --global user.email "dhanasekhar.podigiri@blueyonder.com"
+        git config --global user.name "dhanasekhar podigiri"
+        git commit .github/webapps/webapps.json -m "host name updated"
+        git push
         fi
