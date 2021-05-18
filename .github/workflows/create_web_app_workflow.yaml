@@ -76,7 +76,7 @@ jobs:
       run: | 
         az webapp config container set -n $AZURE_WEB_APP_NAME -g $AZURE_RESOURCE_GROUP --docker-custom-image-name $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG --docker-registry-server-url https://$AZURE_ACR_NAME.azurecr.io --docker-registry-server-user $AZURE_ACR_NAME --docker-registry-server-password `az acr credential show -n $AZURE_ACR_NAME --query passwords[0].value -o tsv`
 
-   - name: get appservice endpoint url
+    - name: get appservice endpoint url
       run: |
         echo "ENDPOINT_URL=https://$(az webapp config hostname list --webapp-name $AZURE_WEB_APP_NAME --resource-group $AZURE_RESOURCE_GROUP --query [].name -o tsv)" >> $GITHUB_ENV
 
