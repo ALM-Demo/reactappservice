@@ -3,7 +3,7 @@ on:
   repository_dispatch:
     types: create_web_app
 jobs:
-  create-web-app-infra:      
+  create-web-app:      
     runs-on: ubuntu-latest
     env:
       GITHUB_REPO_NAME: "${{ github.event.client_payload.repo }}"
@@ -11,6 +11,9 @@ jobs:
       AZURE_RESOURCE_GROUP: "${{ github.event.client_payload.resource_group }}"
       AZURE_DEPLOY_ENVIRONMENT: "${{ github.event.client_payload.environment }}"
       AZURE_WEB_APP_TYPE: "${{ github.event.client_payload.app_type }}"
+      AZURE_CLIENT_ID: "${{ github.event.client_payload.client_id }}"
+      AZURE_CLIENT_SECRET: "${{ github.event.client_payload.client_secret }}"
+      AZURE_TENANT_ID: "${{ github.event.client_payload.tenant_id }}"
       AZURE_WEB_APP_NAME_PREFIX: 'alm-app'
       AZURE_WEB_APP_SKU: 'S1'
       AZURE_WEB_APP_WORKERS: '4'
@@ -29,9 +32,8 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      run: |
+        az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
         
     - name: Create Azure Container Registry
       run: |
@@ -73,3 +75,23 @@ jobs:
     - name: Update Web App Container Settings
       run: | 
         az webapp config container set -n $AZURE_WEB_APP_NAME -g $AZURE_RESOURCE_GROUP --docker-custom-image-name $AZURE_ACR_NAME.azurecr.io/$AZURE_WEB_APP_IMAGE_NAME:$AZURE_WEB_APP_IMAGE_TAG --docker-registry-server-url https://$AZURE_ACR_NAME.azurecr.io --docker-registry-server-user $AZURE_ACR_NAME --docker-registry-server-password `az acr credential show -n $AZURE_ACR_NAME --query passwords[0].value -o tsv`
+
+    - name: Update Azure Web App Endpoints File
+      run: |
+        if [ ! -f .github/webapps/webapps.json ];then
+          mkdir -p .github/webapps
+          touch .github/webapps/webapps.json
+        fi
+        export WEB_APP_URL=`az webapp config hostname list --webapp-name $AZURE_WEB_APP_NAME --resource-group $AZURE_RESOURCE_GROUP --query [].name -o tsv`
+        jq --arg webapp_name $AZURE_WEB_APP_NAME --arg resource_group $AZURE_RESOURCE_GROUP --arg webapp_url "https://$WEB_APP_URL" '. + {($webapp_name): {"resource_group": $resource_group, "webapp_url": $webapp_url}}' < .github/webapps/webapps.json > tmp_webapps.json && mv tmp_webapps.json .github/webapps/webapps.json
+        git config --global user.email "siva.medapati@blueyonder.com"
+        git config --global user.name "Siva Medapati"
+        git config pull.rebase false
+        git pull origin ${BRANCH}
+        git add -f .github/webapps/webapps.json
+        if [ -z "$(git status --porcelain)" ]; then 
+          echo "Nothing to commit"
+        else 
+          git commit -m "update webapp endpoint"
+          git push origin ${BRANCH}
+        fi
