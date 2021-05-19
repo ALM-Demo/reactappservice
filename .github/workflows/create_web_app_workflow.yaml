@@ -81,6 +81,8 @@ jobs:
         if [ ! -f .github/webapps/webapps.json ];then
           mkdir -p .github/webapps
           touch .github/webapps/webapps.json
+        fi
+        if [ ! -s .github/webapps/webapps.json ]; then
           echo "{}" > .github/webapps/webapps.json
         fi
         export WEB_APP_URL=`az webapp config hostname list --webapp-name $AZURE_WEB_APP_NAME --resource-group $AZURE_RESOURCE_GROUP --query [].name -o tsv`
